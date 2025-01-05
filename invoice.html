@@ -444,6 +444,10 @@ table th {
     document.getElementById('items-body').appendChild(newRow);
     // Recalculate after adding a new item
     calculateTotals();
+
+    // Reattach event listeners to new inputs
+    newRow.querySelector('.item-quantity').addEventListener('input', calculateTotals);
+    newRow.querySelector('.item-price').addEventListener('input', calculateTotals);
   });
 
   // Generate the PDF when the button is clicked
