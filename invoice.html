@@ -333,7 +333,7 @@ table th {
     </div>
   </div>
 
-  <script>
+<script>
     function generatePDF() {
       const clientName = document.getElementById("client-name").value || "N/A";
       const clientAddress = document.getElementById("client-address").value || "N/A";
@@ -351,49 +351,45 @@ table th {
       const total = document.getElementById("total").textContent;
 
       const pdfContent = `
-<div style="font-family: 'Arial', sans-serif; padding: 20px; max-width: 800px; margin: auto; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
-  <h1 style="text-align: center; color: #2c3e50; font-size: 20pt; margin-bottom: 10px;">Factura</h1>
-  <div style="margin-bottom: 20px; font-size: 10pt; color: #111;">
-    <h3 style="margin-bottom: 8px; color: #111;">Informações do Cliente</h3>
-    <p><strong>Nome:</strong> ${clientName}</p>
-    <p><strong>NUIT:</strong> ${clientNUIT}</p>
-    <p><strong>Endereço:</strong> ${clientAddress}</p>
-  </div>
-  <div style="margin-bottom: 20px; font-size: 10pt; color: #111;">
-    <h3 style="margin-bottom: 8px; color: #111;">Detalhes da Factura</h3>
-    <p><strong>Data de Emissão:</strong> ${issueDate}</p>
-    <p><strong>Data de Vencimento:</strong> ${dueDate}</p>
-  </div>
-  <h3 style="margin-bottom: 8px; color: #111;">Itens</h3>
-  <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; background-color: #fff; border-radius: 4px; overflow: hidden;">
-    <thead>
-      <tr style="background-color: #2980b9; color: #fff; text-align: left;">
-        <th style="padding: 10px; font-weight: bold;">Descrição</th>
-        <th style="padding: 10px; font-weight: bold;">Quantidade</th>
-        <th style="padding: 10px; font-weight: bold;">Preço Unitário</th>
-        <th style="padding: 10px; font-weight: bold;">Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${items.map(
-        (item, index) => `
-        <tr style="background-color: ${index % 2 === 0 ? '#ecf0f1' : '#ffffff'};">
-          <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.description}</td>
-          <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-          <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.price} MZN</td>
-          <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.total} MZN</td>
-        </tr>
-      `
-      ).join('')}
-    </tbody>
-  </table>
-  <div style="text-align: right; font-size: 10pt; color: #34495e;">
-    <p><strong>Subtotal:</strong> ${subtotal} MZN</p>
-    <p><strong>IVA (16%):</strong> ${vat} MZN</p>
-    <p style="font-size: 12pt; font-weight: bold; color: #e74c3c;"><strong>Total Geral:</strong> ${total} MZN</p>
-  </div>
-</div>
-
+        <div style="font-family: Arial; padding: 20px; max-width: 800px; margin: auto;">
+          <h1 style="text-align: center; color: #1e293b;">Fatura</h1>
+          <div style="margin-bottom: 20px;">
+            <h3>Informações do Cliente</h3>
+            <p><strong>Nome:</strong> ${clientName}</p>
+            <p><strong>Endereço:</strong> ${clientAddress}</p>
+          </div>
+          <div style="margin-bottom: 20px;">
+            <h3>Detalhes da Fatura</h3>
+            <p><strong>Data de Emissão:</strong> ${issueDate}</p>
+            <p><strong>Data de Vencimento:</strong> ${dueDate}</p>
+          </div>
+          <h3>Itens</h3>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <thead>
+              <tr>
+                <th style="border: 1px solid #ddd; padding: 8px;">Descrição</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Quantidade</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Preço Unitário</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.map(item => `
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${item.description}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${item.quantity}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${item.price}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${item.total}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div style="text-align: right;">
+            <p><strong>Subtotal:</strong> ${subtotal} MZN</p>
+            <p><strong>IVA (16%):</strong> ${vat} MZN</p>
+            <p><strong>Total Geral:</strong> ${total} MZN</p>
+          </div>
+        </div>
       `;
 
       const options = {
@@ -420,6 +416,6 @@ table th {
       tableBody.appendChild(newRow);
     });
   </script>
-  
+    
 </body>
 </html>
