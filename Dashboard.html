@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fatura</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+</head>
+  <style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+}
+
+/* Style for the sidebar */
+.side-menu {
+  width: 50px; /* Initial collapsed width */
+  background-color: #6e6e6e;
+  color: #fff;
+  height: 100vh;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  transition: width 0.3s ease; /* Smooth transition for width change */
+}
+
+.side-menu:hover {
+  width: 220px; /* Expanded width on hover */
+}
+
+/* Hide the text by default and show when expanded */
+.side-menu h2 {
+  text-align: right; /* Aligns the text inside the <h2> to the right */
+  margin-bottom: 20px; /* Optional: add space below the title */
+  visibility: hidden; /* Initially hide the text */
+  opacity: 0; /* Make the text fully transparent */
+  transition: opacity 0.3s ease, visibility 0.3s ease; /* Smooth transition */
+}
+
+.side-menu:hover h2 {
+  visibility: visible; /* Make the text visible when sidebar is hovered */
+  opacity: 1; /* Make the text fully opaque when expanded */
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+}
+
+.menu-item a {
+  text-decoration: none; /* Remove the default underline for links */
+  color: inherit; /* Inherit color from the parent (so it doesn't change the text color) */
+  display: flex;
+  align-items: center;
+}
+
+.menu-item img {
+  width: 24px;  /* Icon size */
+  height: 24px; /* Ensure square icon */
+  margin-right: 10px; /* Space between icon and text */
+}
+
+/* Hover effect and active state for menu items */
+.menu-item:hover, .menu-item.active {
+  background-color: #334155;
+}
+
+/* Icon size adjustments */
+.menu-item img {
+  width: 24px;
+  height: 24px;
+  margin-right: 21px;
+  transition: transform 0.3s ease;
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(180deg); /* Adjust color */
+}
+
+/* Hide text when collapsed and show when expanded */
+.side-menu {
+  overflow: hidden; /* Prevent text overflow when collapsed */
+}
+
+.side-menu:hover .menu-item span {
+  opacity: 1; /* Show text on hover */
+  visibility: visible;
+}
+
+.menu-item span {
+  opacity: 0; /* Initially hide the text */
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease; /* Smooth transition */
+}
+
+/* Container for content */
+.container {
+  margin-left: 280px; /* Adjust content margin for expanded sidebar */
+  padding: 20px;
+}
+
+/* Header section styling */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 24px;
+  color: #1e293b;
+}
+
+/* Button styling */
+.btn {
+  background-color: #4f46e5;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #4338ca;
+}
+
+/* Content section styling */
+.content {
+  display: flex;
+  gap: 20px;
+}
+
+.section {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  flex: 1;
+}
+
+.section h2 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #4b5563;
+  border-bottom: 2px solid #4f46e5;
+  padding-bottom: 5px;
+}
+
+/* Form styling */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 5px;
+}
+
+.form-group input, .form-group select {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #374151;
+}
+
+/* Table section styling */
+.table-section {
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+table th, table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+table th {
+  background-color: #f4f4f4;
+}
+
+/* Totals section */
+.totals {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.totals p {
+  margin: 5px 0;
+  font-size: 16px;
+}
+
+.totals p strong {
+  font-size: 18px;
+  color: #1e293b;
+}
+
+.content {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between; /* Ensure even spacing between sections */
+}
+
+.section {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  flex: 1; /* Allow sections to expand and fit within the available space */
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  margin-bottom: 18px;
+}
+
+.section h2 {
+  margin-bottom: 10px;
+  font-size: 18px;
+  color: #4b5563;
+  border-bottom: 2px solid #4f46e5;
+  padding: 5px;
+  text-align: center; /* Center title */
+}
+
+  body {
+    opacity: 0;  /* Start with the body invisible */
+    transition: opacity 0.5s ease-in-out;  /* Transition for fade-in effect */
+  }
+
+  body.loaded {
+    opacity: 1;  /* When the page is fully loaded, fade in */
+  }
+
+  </style>
+
+<body>
+  <div class="side-menu">
+    <h2>Dashboard</h2>
+    <ul class="menu">
+
+<div class="menu-item">
+  <a href="home.html">
+    <img src="img/home.svg" alt="Home" />
+  </a>
+</div>
+
+  <li class="menu-item active">
+    <a href="dashboard.html">
+      <img src="img/dashboard.svg" alt="Dashboard">
+      Dashboard
+    </a>
+  </li>
+  <li class="menu-item">
+    <a href="invoice.html">
+      <img src="img/invoice.svg" alt="Invoicing">
+      Invoicing
+    </a>
+  </li>
+  <li class="menu-item">
+    <a href="commercial.html">
+      <img src="img/commercial.svg" alt="Commercial">
+      Commercial
+    </a>
+  </li>
+  <li class="menu-item">
+    <a href="accounting.html">
+      <img src="img/accounting.svg" alt="Accounting">
+      Accounting
+    </a>
+  </li>
+  <li class="menu-item">
+    <a href="financial.html">
+      <img src="img/financial.svg" alt="Financial">
+      Financial
+    </a>
+  </li>
+  <li class="menu-item">
+    <a href="settings.html">
+      <img src="img/settings.svg" alt="Settings">
+      Settings
+    </a>
+  </li>
+</ul>
+  </div>
+
+<div class="container">
+  <!-- Header Section -->
+  <div class="header">
+    <h1>Factura Dashboard</h1>
+    <button class="btn">Generate Report</button>
+  </div>
+
+  <!-- Content Section -->
+  <div class="content">
+    <!-- Chart Section -->
+    <div class="section">
+      <h2>Monthly Sent Invoices</h2>
+      <canvas id="barChart" width="150" height="100"></canvas>
+    </div>
+    <div class="section">
+      <h2>Top 4 Products Sold</h2>
+      <canvas id="columnChart" width="150" height="100"></canvas>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="section">
+      <h2>Current Composition</h2>
+      <canvas id="doughnutChart" width="150" height="100"></canvas>
+    </div>
+    <div class="section">
+      <h2>Client Service Subscription</h2>
+      <canvas id="pieChart" width="150" height="100"></canvas>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Bar Chart
+  const barCtx = document.getElementById('barChart').getContext('2d');
+  const barChart = new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{
+        label: 'Invoices',
+        data: [10, 20, 15, 30, 25, 35],
+        backgroundColor: '#4f46e5'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true }
+      }
+    }
+  });
+
+  // Column Chart (treated as bar chart with vertical orientation)
+  const columnCtx = document.getElementById('columnChart').getContext('2d');
+  const columnChart = new Chart(columnCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Product A', 'Product B', 'Product C', 'Product D'],
+      datasets: [{
+        label: 'Sales',
+        data: [120, 200, 150, 170],
+        backgroundColor: ['#4f46e5', '#4338ca', '#6b46ca', '#4f46e5']
+      }]
+    },
+    options: {
+      responsive: true,
+      indexAxis: 'y', // Makes it horizontal
+      plugins: {
+        legend: { display: true }
+      }
+    }
+  });
+
+  // Doughnut Chart
+  const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+  const doughnutChart = new Chart(doughnutCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Paid', 'Pending', 'Overdue'],
+      datasets: [{
+        label: 'Invoice Status',
+        data: [60, 25, 15],
+        backgroundColor: ['#4f46e5', '#4338ca', '#4b5563']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true }
+      }
+    }
+  });
+
+  // Pie Chart
+  const pieCtx = document.getElementById('pieChart').getContext('2d');
+  const pieChart = new Chart(pieCtx, {
+    type: 'pie',
+    data: {
+      labels: ['Services', 'Products', 'Subscriptions'],
+      datasets: [{
+        label: 'Revenue Sources',
+        data: [50, 30, 20],
+        backgroundColor: ['#4f46e5', '#4338ca', '#6b46ca']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true }
+      }
+    }
+  });
+</script>
+
+<script>
+  document.querySelector('.btn').addEventListener('click', function () {
+    // Select the container you want to convert to PDF
+    const container = document.querySelector('.content'); // Adjust if you want specific content
+    
+    // Define options for the PDF
+    const options = {
+      filename: 'report.pdf', // Name of the generated PDF file
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 }, // Increase scale for better quality
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // Generate the PDF
+    html2pdf().set(options).from(container).save();
+  });
+</script>
+
+  <script>
+  window.addEventListener('load', function () {
+    document.body.classList.add('loaded');  // Add 'loaded' class when the page finishes loading
+  });
+</script>
+  
+</body>
+</html>

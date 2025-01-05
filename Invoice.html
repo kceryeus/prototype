@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fatura</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+</head>
+  <style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+}
+
+/* Style for the sidebar */
+.side-menu {
+  width: 50px; /* Initial collapsed width */
+  background-color: #6e6e6e;
+  color: #fff;
+  height: 100vh;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  transition: width 0.3s ease; /* Smooth transition for width change */
+}
+
+.side-menu:hover {
+  width: 220px; /* Expanded width on hover */
+}
+
+/* Hide the text by default and show when expanded */
+.side-menu h2 {
+  text-align: right; /* Aligns the text inside the <h2> to the right */
+  margin-bottom: 20px; /* Optional: add space below the title */
+  visibility: hidden; /* Initially hide the text */
+  opacity: 0; /* Make the text fully transparent */
+  transition: opacity 0.3s ease, visibility 0.3s ease; /* Smooth transition */
+}
+
+.side-menu:hover h2 {
+  visibility: visible; /* Make the text visible when sidebar is hovered */
+  opacity: 1; /* Make the text fully opaque when expanded */
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+}
+
+.menu-item a {
+  text-decoration: none; /* Remove the default underline for links */
+  color: inherit; /* Inherit color from the parent (so it doesn't change the text color) */
+  display: flex;
+  align-items: center;
+}
+
+.menu-item img {
+  width: 24px;  /* Icon size */
+  height: 24px; /* Ensure square icon */
+  margin-right: 10px; /* Space between icon and text */
+}
+
+/* Hover effect and active state for menu items */
+.menu-item:hover, .menu-item.active {
+  background-color: #334155;
+}
+
+/* Icon size adjustments */
+.menu-item img {
+  width: 24px;
+  height: 24px;
+  margin-right: 21px;
+  transition: transform 0.3s ease;
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(180deg); /* Adjust color */
+}
+
+/* Hide text when collapsed and show when expanded */
+.side-menu {
+  overflow: hidden; /* Prevent text overflow when collapsed */
+}
+
+.side-menu:hover .menu-item span {
+  opacity: 1; /* Show text on hover */
+  visibility: visible;
+}
+
+.menu-item span {
+  opacity: 0; /* Initially hide the text */
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease; /* Smooth transition */
+}
+
+/* Container for content */
+.container {
+  margin-left: 280px; /* Adjust content margin for expanded sidebar */
+  padding: 20px;
+  display: block;
+  width: 800px;
+}
+
+/* Header section styling */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 24px;
+  color: #1e293b;
+}
+
+/* Button styling */
+.btn {
+  background-color: #4f46e5;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #4338ca;
+}
+
+/* Content section styling */
+.content {
+  display: flex;
+  gap: 20px;
+}
+
+.section {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 10px 10px 10px 10px;
+  flex: 1;
+}
+
+.section h2 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #4b5563;
+  border-bottom: 2px solid #4f46e5;
+  padding-bottom: 5px;
+}
+
+/* Form styling */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+
+.form-group input, .form-group select {
+  padding: 5px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #374151;
+}
+
+/* Table section styling */
+.table-section {
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+table th, table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+table th {
+  background-color: #f4f4f4;
+}
+
+/* Totals section */
+.totals {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.totals p {
+  margin: 5px 0;
+  font-size: 16px;
+}
+
+.totals p strong {
+  font-size: 18px;
+  color: #1e293b;
+}
+  </style>
+<body>
+  <div class="side-menu">
+    <h2>Invoice</h2>
+<ul class="menu">
+  <li class="menu-item">
+    <a href="dashboard.html">
+      <img src="img/dashboard.svg" alt="Dashboard">
+      Dashboard
+    </a>
+  </li>
+  <li class="menu-item active">
+    <a href="invoice.html">
+      <img src="img/invoice.svg" alt="Invoicing">
+      Invoicing
+    </a>
+  </li>
+  <li class="menu-item">
+    <a href="commercial.html">
+      <img src="img/commercial.svg" alt="Commercial">
+      Commercial
+    </a>
+  </li>
+  <li class="menu-item">
+    <a href="accounting.html">
+      <img src="img/accounting.svg" alt="Accounting">
+      Accounting
+    </a>
+  </li>
+  <li class="menu-item">
+    <a href="financial.html">
+      <img src="img/financial.svg" alt="Financial">
+      Financial
+    </a>
+  </li>
+  <li class="menu-item">
+    <a href="settings.html">
+      <img src="img/settings.svg" alt="Settings">
+      Settings
+    </a>
+  </li>
+</ul>
+
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1>Fatura</h1>
+      <button id="generate-pdf" class="btn">Imprimir/Descarregar</button>
+    </div>
+
+    <div class="content">
+      <div class="section">
+        <h2>Informações do Cliente</h2>
+        <div class="form-group">
+          <label for="client-name">Nome do Cliente:</label>
+          <input type="text" id="client-name" placeholder="Ex: Empresa XYZ">
+        </div>
+        <div class="form-group">
+          <label for="client-address">Endereço:</label>
+          <input type="text" id="client-address" placeholder="Ex: Bairro Central">
+        </div>
+        <div class="form-group">
+          <label for="client-NUIT">NUIT:</label>
+          <input type="text" id="client-NUIT" placeholder="Ex: 400123456">
+        </div>
+        <div class="form-group">
+          <label for="client-email">Email:</label>
+          <input type="email" id="client-email" placeholder="cliente@email.com">
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Detalhes da Fatura</h2>
+        <div class="form-group">
+          <label for="issue-date">Data de Emissão:</label>
+          <input type="date" id="issue-date">
+        </div>
+        <div class="form-group">
+          <label for="due-date">Data de Vencimento:</label>
+          <input type="date" id="due-date">
+        </div>
+        <div class="form-group">
+          <label for="payment-terms">Condições de Pagamento:</label>
+          <input type="text" id="payment-terms" placeholder="Ex: Pagamento em 30 dias">
+        </div>
+      </div>
+    </div>
+
+    <div class="table-section">
+      <h2>Itens da Fatura</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Descrição</th>
+            <th>Quantidade</th>
+            <th>Preço Unitário</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="items-body">
+          <tr>
+            <td><input type="text" placeholder="Descrição"></td>
+            <td><input type="number" value="1" min="1" class="item-quantity"></td>
+            <td><input type="number" value="0" step="0.01" class="item-price"></td>
+            <td class="item-total">0.00</td>
+          </tr>
+        </tbody>
+      </table>
+      <button id="add-item" class="btn">Adicionar Item</button>
+    </div>
+
+    <div class="totals">
+      <p><strong>Subtotal:</strong> <span id="subtotal">0.00</span> MZN</p>
+      <p><strong>IVA (16%):</strong> <span id="vat">0.00</span> MZN</p>
+      <p><strong>Total Geral:</strong> <span id="total">0.00</span> MZN</p>
+    </div>
+  </div>
+
+  <script>
+    function generatePDF() {
+      const clientName = document.getElementById("client-name").value || "N/A";
+      const clientAddress = document.getElementById("client-address").value || "N/A";
+      const issueDate = document.getElementById("issue-date").value || "N/A";
+      const dueDate = document.getElementById("due-date").value || "N/A";
+      const clientNUIT = document.getElementById("client-NUIT").value || "N/A";
+      const items = [...document.querySelectorAll("#items-body tr")].map(row => ({
+        description: row.querySelector("td:nth-child(1) input").value || "N/A",
+        quantity: row.querySelector("td:nth-child(2) input").value || "0",
+        price: row.querySelector("td:nth-child(3) input").value || "0",
+        total: row.querySelector("td:nth-child(4)").textContent || "0.00"
+      }));
+      const subtotal = document.getElementById("subtotal").textContent;
+      const vat = document.getElementById("vat").textContent;
+      const total = document.getElementById("total").textContent;
+
+      const pdfContent = `
+<div style="font-family: 'Arial', sans-serif; padding: 20px; max-width: 800px; margin: auto; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+  <h1 style="text-align: center; color: #2c3e50; font-size: 20pt; margin-bottom: 10px;">Factura</h1>
+  <div style="margin-bottom: 20px; font-size: 10pt; color: #111;">
+    <h3 style="margin-bottom: 8px; color: #111;">Informações do Cliente</h3>
+    <p><strong>Nome:</strong> ${clientName}</p>
+    <p><strong>NUIT:</strong> ${clientNUIT}</p>
+    <p><strong>Endereço:</strong> ${clientAddress}</p>
+  </div>
+  <div style="margin-bottom: 20px; font-size: 10pt; color: #111;">
+    <h3 style="margin-bottom: 8px; color: #111;">Detalhes da Factura</h3>
+    <p><strong>Data de Emissão:</strong> ${issueDate}</p>
+    <p><strong>Data de Vencimento:</strong> ${dueDate}</p>
+  </div>
+  <h3 style="margin-bottom: 8px; color: #111;">Itens</h3>
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; background-color: #fff; border-radius: 4px; overflow: hidden;">
+    <thead>
+      <tr style="background-color: #2980b9; color: #fff; text-align: left;">
+        <th style="padding: 10px; font-weight: bold;">Descrição</th>
+        <th style="padding: 10px; font-weight: bold;">Quantidade</th>
+        <th style="padding: 10px; font-weight: bold;">Preço Unitário</th>
+        <th style="padding: 10px; font-weight: bold;">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${items.map(
+        (item, index) => `
+        <tr style="background-color: ${index % 2 === 0 ? '#ecf0f1' : '#ffffff'};">
+          <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.description}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.price} MZN</td>
+          <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.total} MZN</td>
+        </tr>
+      `
+      ).join('')}
+    </tbody>
+  </table>
+  <div style="text-align: right; font-size: 10pt; color: #34495e;">
+    <p><strong>Subtotal:</strong> ${subtotal} MZN</p>
+    <p><strong>IVA (16%):</strong> ${vat} MZN</p>
+    <p style="font-size: 12pt; font-weight: bold; color: #e74c3c;"><strong>Total Geral:</strong> ${total} MZN</p>
+  </div>
+</div>
+
+      `;
+
+      const options = {
+        margin: 10,
+        filename: 'invoice.pdf',
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(options).from(pdfContent).save();
+    }
+
+    document.getElementById("generate-pdf").addEventListener("click", generatePDF);
+
+    document.getElementById("add-item").addEventListener("click", () => {
+      const tableBody = document.getElementById("items-body");
+      const newRow = document.createElement("tr");
+      newRow.innerHTML = `
+        <td><input type="text" placeholder="Descrição"></td>
+        <td><input type="number" value="1" min="1" class="item-quantity"></td>
+        <td><input type="number" value="0" step="0.01" class="item-price"></td>
+        <td class="item-total">0.00</td>
+      `;
+      tableBody.appendChild(newRow);
+    });
+  </script>
+  
+</body>
+</html>
