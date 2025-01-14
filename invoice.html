@@ -349,40 +349,50 @@ table th {
   </div>
 
 <script>
-  // Function to calculate the totals, VAT, and overall total
-  function calculateTotals() {
-    let subtotal = 0;
-    const rows = document.querySelectorAll('#items-body tr');
+// Function to calculate the totals, VAT, and overall total
+function calculateTotals() {
+  let subtotal = 0; // Sum of all item subtotals
+  let totalVAT = 0; // Sum of all VAT values
 
-    rows.forEach(row => {
-      const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
-      const price = parseFloat(row.querySelector('.item-price').value) || 0;
+  const rows = document.querySelectorAll('#items-body tr'); // Select all rows in the table
 
-      // Get the selected VAT rate or custom VAT
-      const vatSelect = row.querySelector('.vat-select');
-      let vatRate = parseFloat(vatSelect.value) || 0;
-      const customVatInput = row.querySelector('.custom-vat');
-      if (vatSelect.value === "custom" && customVatInput.value) {
-        vatRate = parseFloat(customVatInput.value) || 0;
-      }
+  rows.forEach(row => {
+    const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+    const price = parseFloat(row.querySelector('.item-price').value) || 0;
 
-      // Calculate the total for the row (quantity * price + VAT)
-      const rowTotal = quantity * price * (1 + vatRate / 100);
-      row.querySelector('.item-total').textContent = rowTotal.toFixed(2);
+    // Get the selected VAT rate or custom VAT
+    const vatSelect = row.querySelector('.vat-select');
+    let vatRate = parseFloat(vatSelect.value) || 0; // Default to 0% VAT
+    const customVatInput = row.querySelector('.custom-vat');
+    if (vatSelect.value === "custom" && customVatInput.value) {
+      vatRate = parseFloat(customVatInput.value) || 0; // Use custom VAT if provided
+    }
 
-      // Add to the subtotal
-      subtotal += quantity * price;
-    });
+    // Calculate the subtotal for this row (quantity * price)
+    const rowSubtotal = quantity * price;
 
-    // Calculate VAT for the subtotal
-    const vat = subtotal * 0.16; // Default VAT of 16%
-    const total = subtotal + vat;
+    // Calculate the VAT for this row
+    const rowVAT = rowSubtotal * (vatRate / 100);
 
-    // Update the totals in the document
-    document.getElementById('subtotal').textContent = subtotal.toFixed(2);
-    document.getElementById('vat').textContent = vat.toFixed(2);
-    document.getElementById('total').textContent = total.toFixed(2);
-  }
+    // Calculate the total for this row (subtotal + VAT)
+    const rowTotal = rowSubtotal + rowVAT;
+
+    // Update the row's total in the table
+    row.querySelector('.item-total').textContent = rowTotal.toFixed(2);
+
+    // Add to the overall subtotal and VAT
+    subtotal += rowSubtotal;
+    totalVAT += rowVAT;
+  });
+
+  // Calculate the overall grand total
+  const grandTotal = subtotal + totalVAT;
+
+  // Update the totals in the document
+  document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+  document.getElementById('vat').textContent = totalVAT.toFixed(2);
+  document.getElementById('total').textContent = grandTotal.toFixed(2);
+}
 
   // Function to generate PDF
   function generatePDF() {
