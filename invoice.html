@@ -138,6 +138,7 @@ h1 {
 .content {
   display: flex;
   gap: 20px;
+  width: 800px
 }
 
 .section {
@@ -215,6 +216,7 @@ table th {
   color: #1e293b;
 }
   </style>
+  
 <body>
   <div class="side-menu">
     <h2>Invoice</h2>
@@ -308,23 +310,36 @@ table th {
       <table>
         <thead>
           <tr>
+            <th></th>
             <th>Descrição</th>
             <th>Quantidade</th>
             <th>Preço Unitário</th>
+            <th>IVA</th>
             <th>Total</th>
           </tr>
         </thead>
         <tbody id="items-body">
           <tr>
+            <td><button class="remove-item">x</button></td>
             <td><input type="text" placeholder="Descrição"></td>
             <td><input type="number" value="1" min="1" class="item-quantity"></td>
             <td><input type="number" value="0" step="0.01" class="item-price"></td>
+            <td>
+              <select class="vat-select">
+                <option value="16" selected>16%</option>
+                <option value="5">5%</option>
+                <option value="0">Isento</option>
+                <option value="custom">Outro</option>
+              </select>
+              <input type="number" step="0.01" class="custom-vat" style="display: none;" placeholder="%" />
+            </td>
             <td class="item-total">0.00</td>
           </tr>
         </tbody>
       </table>
       <button id="add-item" class="btn">Adicionar Item</button>
     </div>
+    
 
     <div class="totals">
       <p><strong>Subtotal:</strong> <span id="subtotal">0.00</span> MZN</p>
@@ -333,24 +348,73 @@ table th {
     </div>
   </div>
 
-  <script>
-    function generatePDF() {
-      const clientName = document.getElementById("client-name").value || "N/A";
-      const clientAddress = document.getElementById("client-address").value || "N/A";
-      const issueDate = document.getElementById("issue-date").value || "N/A";
-      const dueDate = document.getElementById("due-date").value || "N/A";
-      const clientNUIT = document.getElementById("client-NUIT").value || "N/A";
-      const items = [...document.querySelectorAll("#items-body tr")].map(row => ({
-        description: row.querySelector("td:nth-child(1) input").value || "N/A",
-        quantity: row.querySelector("td:nth-child(2) input").value || "0",
-        price: row.querySelector("td:nth-child(3) input").value || "0",
-        total: row.querySelector("td:nth-child(4)").textContent || "0.00"
-      }));
-      const subtotal = document.getElementById("subtotal").textContent;
-      const vat = document.getElementById("vat").textContent;
-      const total = document.getElementById("total").textContent;
+<script>
+// Function to calculate the totals, VAT, and overall total
+function calculateTotals() {
+  let subtotal = 0; // Sum of all item subtotals
+  let totalVAT = 0; // Sum of all VAT values
 
-      const pdfContent = `
+  const rows = document.querySelectorAll('#items-body tr'); // Select all rows in the table
+
+  rows.forEach(row => {
+    const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+    const price = parseFloat(row.querySelector('.item-price').value) || 0;
+
+    // Get the selected VAT rate or custom VAT
+    const vatSelect = row.querySelector('.vat-select');
+    let vatRate = parseFloat(vatSelect.value) || 0; // Default to 0% VAT
+    const customVatInput = row.querySelector('.custom-vat');
+    if (vatSelect.value === "custom" && customVatInput.value) {
+      vatRate = parseFloat(customVatInput.value) || 0; // Use custom VAT if provided
+    }
+
+    // Calculate the subtotal for this row (quantity * price)
+    const rowSubtotal = quantity * price;
+
+    // Calculate the VAT for this row
+    const rowVAT = rowSubtotal * (vatRate / 100);
+
+    // Calculate the total for this row (subtotal + VAT)
+    const rowTotal = rowSubtotal + rowVAT;
+
+    // Update the row's total in the table
+    row.querySelector('.item-total').textContent = rowTotal.toFixed(2);
+
+    // Add to the overall subtotal and VAT
+    subtotal += rowSubtotal;
+    totalVAT += rowVAT;
+  });
+
+  // Calculate the overall grand total
+  const grandTotal = subtotal + totalVAT;
+
+  // Update the totals in the document
+  document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+  document.getElementById('vat').textContent = totalVAT.toFixed(2);
+  document.getElementById('total').textContent = grandTotal.toFixed(2);
+}
+
+  // Function to generate PDF
+  function generatePDF() {
+    const clientName = document.getElementById("client-name").value || "N/A";
+    const clientAddress = document.getElementById("client-address").value || "N/A";
+    const issueDate = document.getElementById("issue-date").value || "N/A";
+    const dueDate = document.getElementById("due-date").value || "N/A";
+    const clientNUIT = document.getElementById("client-NUIT").value || "N/A";
+
+    // Get items data
+    const items = [...document.querySelectorAll("#items-body tr")].map(row => ({
+      description: row.querySelector("td:nth-child(2) input").value || "N/A",
+      quantity: row.querySelector(".item-quantity").value || "0",
+      price: row.querySelector(".item-price").value || "0",
+      total: row.querySelector(".item-total").textContent || "0.00"
+    }));
+
+    const subtotal = document.getElementById("subtotal").textContent;
+    const vat = document.getElementById("vat").textContent;
+    const total = document.getElementById("total").textContent;
+
+    const pdfContent = `
 <div style="font-family: 'Arial', sans-serif; padding: 20px; max-width: 800px; margin: auto; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
   <h1 style="text-align: center; color: #2c3e50; font-size: 20pt; margin-bottom: 10px;">Factura</h1>
   <div style="margin-bottom: 20px; font-size: 10pt; color: #111;">
@@ -383,8 +447,7 @@ table th {
           <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.price} MZN</td>
           <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.total} MZN</td>
         </tr>
-      `
-      ).join('')}
+      `).join('')}
     </tbody>
   </table>
   <div style="text-align: right; font-size: 10pt; color: #34495e;">
@@ -392,34 +455,72 @@ table th {
     <p><strong>IVA (16%):</strong> ${vat} MZN</p>
     <p style="font-size: 12pt; font-weight: bold; color: #e74c3c;"><strong>Total Geral:</strong> ${total} MZN</p>
   </div>
-</div>
+</div>`;
 
-      `;
+    const options = {
+      margin: 10,
+      filename: 'invoice.pdf',
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
 
-      const options = {
-        margin: 10,
-        filename: 'invoice.pdf',
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
+    html2pdf().set(options).from(pdfContent).save();
+  }
 
-      html2pdf().set(options).from(pdfContent).save();
+  // Event listener for VAT dropdown
+  document.addEventListener("change", (event) => {
+    if (event.target.classList.contains("vat-select")) {
+      const vatSelect = event.target;
+      const customVatInput = vatSelect.nextElementSibling;
+
+      if (vatSelect.value === "custom") {
+        customVatInput.style.display = "inline-block";
+        customVatInput.focus(); // Focus on the custom input
+      } else {
+        customVatInput.style.display = "none";
+        customVatInput.value = ""; // Clear the custom input value
+      }
+      calculateTotals(); // Recalculate totals when VAT is changed
     }
+  });
 
-    document.getElementById("generate-pdf").addEventListener("click", generatePDF);
+  // Add event listeners to input fields for real-time calculation
+  document.querySelectorAll('.item-quantity, .item-price').forEach(input => {
+    input.addEventListener('input', calculateTotals);
+  });
 
-    document.getElementById("add-item").addEventListener("click", () => {
-      const tableBody = document.getElementById("items-body");
-      const newRow = document.createElement("tr");
-      newRow.innerHTML = `
-        <td><input type="text" placeholder="Descrição"></td>
-        <td><input type="number" value="1" min="1" class="item-quantity"></td>
-        <td><input type="number" value="0" step="0.01" class="item-price"></td>
-        <td class="item-total">0.00</td>
-      `;
-      tableBody.appendChild(newRow);
+  // Add a new item to the table
+  document.getElementById('add-item').addEventListener('click', () => {
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+      <td><button class="remove-item">X</button></td>
+      <td><input type="text" placeholder="Descrição"></td>
+      <td><input type="number" value="1" min="1" class="item-quantity"></td>
+      <td><input type="number" value="0" step="0.01" class="item-price"></td>
+      <td>
+        <select class="vat-select">
+          <option value="16" selected>16%</option>
+          <option value="5">5%</option>
+          <option value="0">Isento</option>
+          <option value="custom">Outro</option>
+        </select>
+        <input type="number" step="0.01" class="custom-vat" style="display: none;" placeholder="%" />
+      </td>
+      <td class="item-total">0.00</td>
+    `;
+    document.getElementById('items-body').appendChild(newRow);
+
+    // Reattach event listeners to the new input fields
+    newRow.querySelector('.item-quantity').addEventListener('input', calculateTotals);
+    newRow.querySelector('.item-price').addEventListener('input', calculateTotals);
+    newRow.querySelector('.vat-select').addEventListener('change', calculateTotals);
+    newRow.querySelector('.remove-item').addEventListener('click', () => {
+      newRow.remove();
+      calculateTotals();
     });
-  </script>
+  });
+
+</script>
   
 </body>
 </html>

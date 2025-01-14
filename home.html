@@ -134,83 +134,62 @@ h1 {
 
 /* Content section styling */
 .content {
-  display: flex;
   gap: 20px;
 }
 
-.section {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  flex: 1;
-}
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+  }
 
-.section h2 {
-  margin-bottom: 15px;
-  font-size: 18px;
-  color: #4b5563;
-  border-bottom: 2px solid #4f46e5;
-  padding-bottom: 5px;
-}
+  .modal-content {
+    padding: 20px;
+    border-radius: 10px;
+  }
 
-/* Form styling */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 15px;
-}
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+  }
 
-.form-group label {
-  font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 5px;
-}
+  .modal-header h3 {
+    margin: 0;
+    color: #fff;
+  }
 
-.form-group input, .form-group select {
-  padding: 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
-  color: #374151;
-}
+  .modal-close {
+    cursor: pointer;
+    font-size: 24px;
+    color: #fff;
+  }
 
-/* Table section styling */
-.table-section {
-  margin-top: 20px;
-}
+  /* Blocks styling */
+  .module {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
+  .module h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
 
-table th, table td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: left;
-}
-
-table th {
-  background-color: #f4f4f4;
-}
-
-/* Totals section */
-.totals {
-  text-align: right;
-  margin-top: 20px;
-}
-
-.totals p {
-  margin: 5px 0;
-  font-size: 16px;
-}
-
-.totals p strong {
-  font-size: 18px;
-  color: #1e293b;
-}
+  .module .price {
+    font-size: 20px;
+    color: #4f46e5;
+  }
 
   body {
     opacity: 0;  /* Start with the body invisible */
@@ -219,6 +198,9 @@ table th {
 
   body.loaded {
     opacity: 1;  /* When the page is fully loaded, fade in */
+  .container {
+    padding: 20px;
+  }
 
   </style>
 
@@ -264,35 +246,72 @@ table th {
   </li>
 </ul>
 </div>
+
   <!-- Barra superior -->
   <div class="top-bar">
     <ul class="top-bar-menu">
-      <li><a href="contact.html">Contato</a></li>
+      <li><a href="contact.html">Contacto</a></li>
       <li><a href="about.html">Sobre</a></li>
       <li><a href="dashboard.html">Dashboard</a></li>
     </ul>
   </div>
 
-  <!-- Containers dos módulos -->
+  <!-- Main Button to Open Modal -->
   <div class="container">
-    <div class="module">
-      <h3>Invoice</h3>
-      <p class="price">Preço:MZN 149</p>
-    </div>
-    <div class="module">
-      <h3>Commercial</h3>
-      <p class="price">Preço: MZN 199</p>
-    </div>
-    <div class="module">
-      <h3>Accounting</h3>
-      <p class="price">Preço: MZN 249</p>
-    </div>
-    <div class="module">
-      <h3>Financial</h3>
-      <p class="price">Preço: MZN 299</p>
+    <button class="btn" onclick="openModal()">Módulos</button>
+  </div>
+
+  <!-- Modal for blocks -->
+  <div id="blocksModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Gerir Módulos</h3>
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+      </div>
+      <div class="module">
+        <h3>Invoice</h3>
+        <p class="price">Preço: MZN 149</p>
+      </div>
+      <div class="module">
+        <h3>Commercial</h3>
+        <p class="price">Preço: MZN 199</p>
+      </div>
+      <div class="module">
+        <h3>Accounting</h3>
+        <p class="price">Preço: MZN 249</p>
+      </div>
+      <div class="module">
+        <h3>Financial</h3>
+        <p class="price">Preço: MZN 299</p>
+      </div>
     </div>
   </div>
 
+  <!-- Entities, Banks, and Cashiers Section -->
+  <div class="container">
+    <h2>Entidades (Clientes)</h2>
+    <!-- Add/Edit/Delete Clients -->
+    <button class="btn">Adicionar Cliente</button>
+    <button class="btn">Editar Cliente</button>
+    <button class="btn">Remover Cliente</button>
+
+    <h2>Banks & Cashiers</h2>
+    <!-- Add/Edit/Delete Banks -->
+    <button class="btn">Adicionar Banco</button>
+    <button class="btn">Editar Banco</button>
+    <button class="btn">Remover Banco</button>
+    <button class="btn">Adicionar Caixa</button>
+    <button class="btn">Editar Caixa</button>
+    <button class="btn">Remover Caixa</button>
+
+    <!-- Show current income, expenses, and difference -->
+    <div class="module">
+      <h3>Bank Overview</h3>
+      <p><strong>Receitas correntes: </strong> MZN 100,000</p>
+      <p><strong>Despesas Correntes: </strong> MZN 50,000</p>
+      <p><strong>Saldo: </strong> MZN 50,000</p>
+    </div>
+  </div>
   <style>
     /* Estilos para a barra superior */
     .top-bar {
@@ -320,7 +339,6 @@ table th {
 
     /* Estilos para os containers dos módulos */
     .container {
-      display: flex;
       justify-content: space-between;
       margin-top: 20px;
     }
@@ -328,9 +346,9 @@ table th {
       background-color: #ffffff;
       border-radius: 15px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      padding: 20px;
+      padding: 20px 20px 20px;
       text-align: center;
-      width: 18%;
+      margin-top: 20px;
       transition: transform 0.3s ease;
     }
     .module:hover {
@@ -361,6 +379,15 @@ table th {
   window.addEventListener('load', function () {
     document.body.classList.add('loaded');  // Add 'loaded' class when the page finishes loading
   });
+
+ function openModal() {
+      document.getElementById("blocksModal").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("blocksModal").style.display = "none";
+    }
+
 </script>
 
   
