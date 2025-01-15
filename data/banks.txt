@@ -1,1 +1,5 @@
-
+Inserir uma lista pré-definida de bancos moçambicanos e estrangeiros relevantes. Por exemplo:
+Millennium BIM - BIM
+Banco Comercial e de Investimentos - BCI
+First National Bank Mozambique - FNB
+Etc
