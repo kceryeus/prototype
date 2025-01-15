@@ -1,0 +1,1 @@
+For each component, add a js and a css that go together
