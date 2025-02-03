@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fatura</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <script src="../js/scripts/windowload.js"></script>
 </head>
   <style>
 body {
@@ -170,7 +171,29 @@ h1 {
     font-size: 24px;
     color: #fff;
   }
-
+  .top-bar {
+    background-color: #6e6e6e;
+    padding: 10px;
+    text-align: right;
+  }
+  .top-bar-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .top-bar-menu li {
+    display: inline;
+    margin: 0 15px;
+  }
+  .top-bar-menu li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 16px;
+  }
+  .top-bar-menu li a:hover {
+    text-decoration: underline;
+  }
+  
   /* Blocks styling */
   .module {
     background-color: #fff;
@@ -191,7 +214,15 @@ h1 {
     color: #4f46e5;
   }
 
-  body {
+      .inactive {
+      opacity: 0.6;
+      text-decoration: line-through;
+    }
+    .hidden {
+      display: none;
+    }
+
+    body {
     opacity: 0;  /* Start with the body invisible */
     transition: opacity 0.5s ease-in-out;  /* Transition for fade-in effect */
   }
@@ -201,7 +232,7 @@ h1 {
   .container {
     padding: 20px;
   }
-
+  }
   </style>
 
 <body>
@@ -210,45 +241,44 @@ h1 {
 <ul class="menu">
   <li class="menu-item">
     <a href="dashboard.html">
-      <img src="img/dashboard.svg" alt="Dashboard">
+      <img src="../assets/img/icons/dashboard.svg" alt="Dashboard">
       Dashboard
     </a>
   </li>
   <li class="menu-item">
-    <a href="invoice.html">
-      <img src="img/invoice.svg" alt="Invoicing">
+    <a href="modules/invoice.html">
+      <img src="../assets/img/icons/invoice.svg" alt="Invoicing">
       Invoicing
     </a>
   </li>
   <li class="menu-item">
-    <a href="commercial.html">
-      <img src="img/commercial.svg" alt="Commercial">
+    <a href="modules/commercial.html">
+      <img src="../assets/img/icons/commercial.svg" alt="Commercial">
       Commercial
     </a>
   </li>
   <li class="menu-item">
-    <a href="accounting.html">
-      <img src="img/accounting.svg" alt="Accounting">
+    <a href="modules/accounting.html">
+      <img src="../assets/img/icons/accounting.svg" alt="Accounting">
       Accounting
     </a>
   </li>
   <li class="menu-item">
-    <a href="financial.html">
-      <img src="img/financial.svg" alt="Financial">
+    <a href="modules/financial.html">
+      <img src="../assets/img/icons/financial.svg" alt="Financial">
       Financial
     </a>
   </li>
   <li class="menu-item">
     <a href="settings.html">
-      <img src="img/settings.svg" alt="Settings">
+      <img src="../assets/img/icons/settings.svg" alt="Settings">
       Settings
     </a>
   </li>
 </ul>
 </div>
-
-  <!-- Barra superior -->
-  <div class="top-bar">
+   <!-- Barra superior -->
+   <div class="top-bar">
     <ul class="top-bar-menu">
       <li><a href="contact.html">Contacto</a></li>
       <li><a href="about.html">Sobre</a></li>
@@ -290,106 +320,154 @@ h1 {
   <!-- Entities, Banks, and Cashiers Section -->
   <div class="container">
     <h2>Entidades (Clientes)</h2>
-    <!-- Add/Edit/Delete Clients -->
-    <button class="btn">Adicionar Cliente</button>
-    <button class="btn">Editar Cliente</button>
-    <button class="btn">Remover Cliente</button>
+    <!-- Formulário para adicionar clientes -->
+    <form id="addClientForm">
+      <input type="text" id="clientName" placeholder="Nome do Cliente" required>
+      <input type="text" id="clientAddress" placeholder="Endereço" required>
+      <input type="text" id="clientNUIT" placeholder="NUIT" required>
+      <input type="email" id="clientEmail" placeholder="Email" required>
+      <button type="submit" class="btn">Adicionar Cliente</button>
+    </form>
 
-    <h2>Banks & Cashiers</h2>
-    <!-- Add/Edit/Delete Banks -->
-    <button class="btn">Adicionar Banco</button>
-    <button class="btn">Editar Banco</button>
-    <button class="btn">Remover Banco</button>
-    <button class="btn">Adicionar Caixa</button>
-    <button class="btn">Editar Caixa</button>
-    <button class="btn">Remover Caixa</button>
+    <!-- Campo de pesquisa -->
+    <input type="text" id="searchClient" placeholder="Pesquisar cliente..." oninput="searchClients()">
 
-    <!-- Show current income, expenses, and difference -->
-    <div class="module">
-      <h3>Bank Overview</h3>
-      <p><strong>Receitas correntes: </strong> MZN 100,000</p>
-      <p><strong>Despesas Correntes: </strong> MZN 50,000</p>
-      <p><strong>Saldo: </strong> MZN 50,000</p>
+    <!-- Botão para expandir/comprimir a lista -->
+    <button class="btn" onclick="toggleClientList()">Comprimir Lista</button>
+
+    <!-- Lista de clientes -->
+    <div id="clientList">
+      <h3>Clientes Cadastrados</h3>
+      <ul id="clients"></ul>
     </div>
+
+    <!-- Botões para editar e inativar clientes -->
+    <button class="btn" onclick="editClient()">Editar Cliente</button>
+    <button class="btn" onclick="inactivateClient()">Inativar Cliente</button>
   </div>
-  <style>
-    /* Estilos para a barra superior */
-    .top-bar {
-      background-color: #6e6e6e;
-      padding: 10px;
-      text-align: right;
-    }
-    .top-bar-menu {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-    .top-bar-menu li {
-      display: inline;
-      margin: 0 15px;
-    }
-    .top-bar-menu li a {
-      color: #ffffff;
-      text-decoration: none;
-      font-size: 16px;
-    }
-    .top-bar-menu li a:hover {
-      text-decoration: underline;
-    }
-
-    /* Estilos para os containers dos módulos */
-    .container {
-      justify-content: space-between;
-      margin-top: 20px;
-    }
-    .module {
-      background-color: #ffffff;
-      border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      padding: 20px 20px 20px;
-      text-align: center;
-      margin-top: 20px;
-      transition: transform 0.3s ease;
-    }
-    .module:hover {
-      transform: scale(1.05); /* Aumenta o tamanho quando o mouse passa sobre o container */
-    }
-    .module h3 {
-      font-size: 18px;
-      margin-bottom: 15px;
-    }
-    .price {
-      font-size: 20px;
-      color: #4f46e5;
-    }
-
-    opacity: 0;  /* Start with the body invisible */
-    transition: opacity 0.5s ease-in-out;  /* Transition for fade-in effect */
-  }
-
-  body.loaded {
-    opacity: 1;  /* When the page is fully loaded, fade in */
-  }
-
-  </style>
-
-
 
   <script>
-  window.addEventListener('load', function () {
-    document.body.classList.add('loaded');  // Add 'loaded' class when the page finishes loading
-  });
+    // Array para armazenar clientes
+    let clients = [];
 
- function openModal() {
-      document.getElementById("blocksModal").style.display = "flex";
+    // Função para adicionar cliente
+    document.getElementById('addClientForm').addEventListener('submit', function (e) {
+      e.preventDefault(); // Evita o recarregamento da página
+
+      // Captura os dados do formulário
+      const clientName = document.getElementById('clientName').value;
+      const clientAddress = document.getElementById('clientAddress').value;
+      const clientNUIT = document.getElementById('clientNUIT').value;
+      const clientEmail = document.getElementById('clientEmail').value;
+
+      // Cria um objeto cliente
+      const client = {
+        name: clientName,
+        address: clientAddress,
+        nuit: clientNUIT,
+        email: clientEmail,
+        active: true // Por padrão, o cliente é ativo
+      };
+
+      // Adiciona o cliente ao array
+      clients.push(client);
+
+      // Limpa o formulário
+      document.getElementById('addClientForm').reset();
+
+      // Atualiza a lista de clientes na página
+      updateClientList();
+    });
+
+    // Função para atualizar a lista de clientes
+    function updateClientList() {
+      const clientList = document.getElementById('clients');
+      clientList.innerHTML = ''; // Limpa a lista atual
+
+      // Adiciona cada cliente à lista
+      clients.forEach((client, index) => {
+        const li = document.createElement('li');
+        li.className = client.active ? '' : 'inactive'; // Adiciona classe para clientes inativos
+        li.innerHTML = `
+          <strong>${client.name}</strong> - ${client.address} (NUIT: ${client.nuit}, Email: ${client.email})
+          <button onclick="editClient(${index})">Editar</button>
+          <button onclick="inactivateClient(${index})">${client.active ? 'Inativar' : 'Ativar'}</button>
+        `;
+        clientList.appendChild(li);
+      });
+    }
+
+    // Função para editar cliente
+    function editClient(index) {
+      const client = clients[index];
+
+      // Preenche o formulário com os dados do cliente
+      document.getElementById('clientName').value = client.name;
+      document.getElementById('clientAddress').value = client.address;
+      document.getElementById('clientNUIT').value = client.nuit;
+      document.getElementById('clientEmail').value = client.email;
+
+      // Remove o cliente da lista para edição
+      clients.splice(index, 1);
+
+      // Atualiza a lista de clientes
+      updateClientList();
+    }
+
+    // Função para inativar/ativar cliente
+    function inactivateClient(index) {
+      clients[index].active = !clients[index].active; // Alterna entre ativo e inativo
+      updateClientList(); // Atualiza a lista de clientes
+    }
+
+    // Função para pesquisar clientes
+    function searchClients() {
+      const searchTerm = document.getElementById('searchClient').value.toLowerCase();
+      const filteredClients = clients.filter(client =>
+        client.name.toLowerCase().includes(searchTerm) ||
+        client.address.toLowerCase().includes(searchTerm) ||
+        client.nuit.toLowerCase().includes(searchTerm) ||
+        client.email.toLowerCase().includes(searchTerm)
+      );
+
+      // Atualiza a lista com os clientes filtrados
+      const clientList = document.getElementById('clients');
+      clientList.innerHTML = ''; // Limpa a lista atual
+
+      filteredClients.forEach((client, index) => {
+        const li = document.createElement('li');
+        li.className = client.active ? '' : 'inactive'; // Adiciona classe para clientes inativos
+        li.innerHTML = `
+          <strong>${client.name}</strong> - ${client.address} (NUIT: ${client.nuit}, Email: ${client.email})
+          <button onclick="editClient(${index})">Editar</button>
+          <button onclick="inactivateClient(${index})">${client.active ? 'Inativar' : 'Ativar'}</button>
+        `;
+        clientList.appendChild(li);
+      });
+    }
+
+    // Função para expandir/comprimir a lista
+    function toggleClientList() {
+      const clientList = document.getElementById('clientList');
+      const toggleButton = document.querySelector('.container .btn');
+
+      if (clientList.classList.contains('hidden')) {
+        clientList.classList.remove('hidden');
+        toggleButton.textContent = 'Comprimir Lista';
+      } else {
+        clientList.classList.add('hidden');
+        toggleButton.textContent = 'Expandir Lista';
+      }
+    }
+
+    // Funções para abrir e fechar o modal
+    function openModal() {
+      document.getElementById('blocksModal').style.display = 'flex';
     }
 
     function closeModal() {
-      document.getElementById("blocksModal").style.display = "none";
+      document.getElementById('blocksModal').style.display = 'none';
     }
-
-</script>
-
-  
+  </script>
 </body>
 </html>
